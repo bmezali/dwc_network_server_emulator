@@ -121,6 +121,8 @@ class GamespyDatabase(object):
             tx.nonquery("CREATE TABLE IF NOT EXISTS console_macadr_banned (macadr TEXT)")
             tx.nonquery("CREATE TABLE IF NOT EXISTS console_csnum_banned (csnum TEXT)")
             tx.nonquery("CREATE TABLE IF NOT EXISTS console_cfc_banned (cfc TEXT)")
+            tx.nonquery("CREATE TABLE IF NOT EXISTS ingamesn_banned(ingamesn TEXT)")
+            tx.nonquery("CREATE TABLE IF NOT EXISTS devname_banned(devname TEXT)")
             tx.nonquery("CREATE TABLE IF NOT EXISTS pending (macadr TEXT)")
             tx.nonquery("CREATE TABLE IF NOT EXISTS registered (macadr TEXT)")
             # Create some indexes for performance.
@@ -430,6 +432,21 @@ class GamespyDatabase(object):
             return int(row[0]) > 0
       else:
          return False
+# This is a hacky way to immitating Nintendo's name black listing system. In order to use this you will need a website that will decode utf-8
+# For example you can use https://mothereff.in/utf-8
+    def is_ingamesn_banned(self,postdata):
+      if 'ingamesn' in postdata:
+         with Transaction(self.conn) as tx:
+            row = tx.queryone("SELECT COUNT(*) FROM ingamesn_banned WHERE ingamesn = ?",(postdata['ingamesn'],))
+            return int(row[0]) > 0
+      else:
+         return False
+# This is a hacky way to immitating Nintendo's name black listing system. In order to use this you will need a website that will decode utf-8
+# For example you can use https://mothereff.in/utf-8
+    def is_devname_banned(self,postdata):
+      if 'devname' in postdata:
+         with Transaction(self.conn) as tx:
+            row = tx.queryone("SELECT COUNT(*) FROM devname_banned WHERE devname = ?",(postdata['devname'],))
     def pending(self,postdata):
         with Transaction(self.conn) as tx:
             row = tx.queryone("SELECT COUNT(*) FROM pending WHERE macadr = ?",(postdata['macadr'],))
